@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Juggle math - calculators</title>
+<style>
+  :root { --accent: #b83a8a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Georgia, 'Times New Roman', serif; background: #f8f5f1; color: #2c2520; line-height: 1.55; }
+  main { max-width: 1100px; margin: 0 auto; padding: 40px 20px 64px; }
+  h1 { font-size: 2rem; margin: 0 0 8px; color: var(--accent); }
+  .lede { margin: 0 0 14px; max-width: 640px; }
+  .note { background: #fff; border: 1px solid #e4d8cd; border-left: 4px solid var(--accent); border-radius: 6px; padding: 12px 16px; font-size: 0.9rem; margin: 0 0 28px; max-width: 720px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  section { background: #fff; border: 1px solid #e4d8cd; border-radius: 8px; padding: 20px 22px; }
+  h2 { font-size: 1.15rem; margin: 0 0 6px; }
+  .hint { font-size: 0.9rem; color: #8a7563; margin: 0 0 14px; }
+  label { display: block; font-size: 0.9rem; margin: 10px 0 3px; }
+  input { width: 100%; padding: 8px 10px; font-size: 1rem; border: 1px solid #cdbbab; border-radius: 5px; font-family: inherit; }
+  button { margin-top: 16px; width: 100%; padding: 11px; background: var(--accent); color: #fff; border: 0; border-radius: 6px; font-size: 1rem; cursor: pointer; font-family: inherit; }
+  button:hover { filter: brightness(1.08); }
+  .out { margin-top: 14px; font-size: 1rem; min-height: 1.4em; }
+  .out.err { color: #a32222; }
+  footer { max-width: 1100px; margin: 0 auto; padding: 0 20px 40px; font-size: 0.85rem; color: #b3a496; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Juggle math</h1>
+  <p class="lede">The pattern names the balls, the throw names the height, and the beat names the tempo. Exact arithmetic, every borrowed number labeled.</p>
+  <div class="note">Illustrative planning arithmetic only. Every beat, hand count and gravity value is a labeled default you can change; learn the pattern on grass, over a soft landing.</div>
+  <div class="grid">
+    <section>
+      <h2>Pattern plan</h2>
+      <p class="hint">The pattern names the balls.</p>
+      <label for="p-p">Siteswap pattern (digits, space separated)</label>
+      <input id="p-p" type="text" value="5 3 1">
+      <button id="p-go">Check the pattern</button>
+      <div class="out" id="p-out"></div>
+    </section>
+    <section>
+      <h2>Throw plan</h2>
+      <p class="hint">The throw names the height.</p>
+      <label for="t-t">Throw value (1-9)</label>
+      <input id="t-t" type="number" value="5" min="0" step="1">
+      <label for="t-b">Labeled beat (ms)</label>
+      <input id="t-b" type="number" value="400" min="0" step="10">
+      <button id="t-go">Measure the throw</button>
+      <div class="out" id="t-out"></div>
+    </section>
+    <section>
+      <h2>Tempo plan</h2>
+      <p class="hint">The beat names the tempo.</p>
+      <label for="m-b">Labeled beat (ms)</label>
+      <input id="m-b" type="number" value="400" min="0" step="10">
+      <label for="m-h">Hands</label>
+      <input id="m-h" type="number" value="2" min="1" step="1">
+      <button id="m-go">Count the tempo</button>
+      <div class="out" id="m-out"></div>
+    </section>
+  </div>
+</main>
+<footer>Built by the app factory. <a href="index.html">About</a> &middot; <a href="https://github.com/iLanis-agent/jugglemath">Source</a></footer>
+<script src="engine.js"></script>
+<script>
+function num(id){ return parseFloat(document.getElementById(id).value); }
+function show(id, r, render){
+  var el = document.getElementById(id);
+  if (r.error) { el.textContent = r.error; el.classList.add('err'); }
+  else { el.textContent = render(r); el.classList.remove('err'); }
+}
+document.getElementById('p-go').addEventListener('click', function(){
+  var arr = document.getElementById('p-p').value.split(/[\s,]+/).filter(function(s){return s.length>0;}).map(Number);
+  show('p-out', JuggleMath.patternPlan(arr), function(r){ return JuggleMath.renderPattern(r, arr); });
+});
+document.getElementById('t-go').addEventListener('click', function(){
+  var a=[num('t-t'),num('t-b')];
+  show('t-out', JuggleMath.throwPlan.apply(null,a), function(r){ return JuggleMath.renderThrow.apply(null,[r].concat(a)); });
+});
+document.getElementById('m-go').addEventListener('click', function(){
+  var a=[num('m-b'),num('m-h')];
+  show('m-out', JuggleMath.tempoPlan.apply(null,a), function(r){ return JuggleMath.renderTempo.apply(null,[r].concat(a)); });
+});
+</script>
+</body>
+</html>
